@@ -17,13 +17,16 @@
  *   GNU General Public License for more details.                           *
  *                                                                          *
  *   To view a copy of the GNU General Public License, go to the following  *
- *   location: <https://www.gnu.org/licenses/>.                             *
+ *   location: <https://www.gnu.org/licenses/>.                              *
  ****************************************************************************/
 
 #include "../config.h"
+
+#if ENABLED(TOUCH_UI_FTDI_EVE) && defined(TOUCH_UI_LULZBOT_BIO)
+
 #include "screens.h"
 
-#ifdef FTDI_BIO_PRINTING_DIALOG_BOX
+#include "../ftdi_eve_lib/extras/circular_progress.h"
 
 using namespace FTDI;
 using namespace ExtUI;
@@ -32,7 +35,7 @@ using namespace Theme;
 #define GRID_COLS 2
 #define GRID_ROWS 9
 
-void BioPrintingDialogBox::draw_status_message(draw_mode_t what, const char *message) {
+void BioPrintingDialogBox::draw_status_message(draw_mode_t what, const char* message) {
   if (what & BACKGROUND) {
     CommandProcessor cmd;
     cmd.cmd(COLOR_RGB(bg_text_enabled))
@@ -75,10 +78,14 @@ void BioPrintingDialogBox::draw_interaction_buttons(draw_mode_t what) {
        .font(font_medium)
        .colors(isPrinting() ? action_btn : normal_btn)
        .tag(2).button(BTN_POS(1,9), BTN_SIZE(1,1), F("Menu"))
-       .enabled(isPrinting() ? TERN0(SDSUPPORT, isPrintingFromMedia()) : 1)
+        #if ENABLED(SDSUPPORT)
+          .enabled(isPrinting() ? isPrintingFromMedia() : 1)
+        #else
+          .enabled(isPrinting() ? 0 : 1)
+        #endif
        .tag(3)
        .colors(isPrinting() ? normal_btn : action_btn)
-       .button(BTN_POS(2,9), BTN_SIZE(1,1), isPrinting() ? F("Cancel") : F("Back"));
+       .button( BTN_POS(2,9), BTN_SIZE(1,1), isPrinting() ? F("Cancel") : F("Back"));
   }
 }
 
@@ -111,7 +118,7 @@ void BioPrintingDialogBox::setStatusMessage(progmem_str message) {
   setStatusMessage(buff);
 }
 
-void BioPrintingDialogBox::setStatusMessage(const char *message) {
+void BioPrintingDialogBox::setStatusMessage(const char* message) {
   CommandProcessor cmd;
   cmd.cmd(CMD_DLSTART)
      .cmd(CLEAR_COLOR_RGB(bg_color))
@@ -124,7 +131,8 @@ void BioPrintingDialogBox::setStatusMessage(const char *message) {
   storeBackground();
 
   #if ENABLED(TOUCH_UI_DEBUG)
-    SERIAL_ECHO_MSG("New status message: ", message);
+    SERIAL_ECHO_START();
+    SERIAL_ECHOLNPAIR("New status message: ", message);
   #endif
 
   if (AT_SCREEN(BioPrintingDialogBox))
@@ -144,4 +152,4 @@ void BioPrintingDialogBox::show() {
   GOTO_SCREEN(BioPrintingDialogBox);
 }
 
-#endif // FTDI_BIO_PRINTING_DIALOG_BOX
+#endif // TOUCH_UI_FTDI_EVE

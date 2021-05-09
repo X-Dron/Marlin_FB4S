@@ -17,13 +17,14 @@
  *   GNU General Public License for more details.                           *
  *                                                                          *
  *   To view a copy of the GNU General Public License, go to the following  *
- *   location: <https://www.gnu.org/licenses/>.                             *
+ *   location: <https://www.gnu.org/licenses/>.                              *
  ****************************************************************************/
 
 #include "../config.h"
-#include "screens.h"
 
-#ifdef FTDI_SAVE_SETTINGS_DIALOG_BOX
+#if ENABLED(TOUCH_UI_FTDI_EVE)
+
+#include "screens.h"
 
 using namespace ExtUI;
 
@@ -55,9 +56,10 @@ void SaveSettingsDialogBox::promptToSaveSettings() {
      // so SaveSettingsDialogBox doesn't return here.
      GOTO_SCREEN(SaveSettingsDialogBox);
      current_screen.forget();
+   } else {
+     // No save needed.
+     GOTO_PREVIOUS();
    }
-   else
-     GOTO_PREVIOUS(); // No save needed.
 }
 
-#endif // FTDI_SAVE_SETTINGS_DIALOG_BOX
+#endif // TOUCH_UI_FTDI_EVE

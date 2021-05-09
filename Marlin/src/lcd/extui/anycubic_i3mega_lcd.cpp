@@ -52,11 +52,6 @@ namespace ExtUI {
   void onFilamentRunout(const extruder_t extruder)   { AnycubicTFT.OnFilamentRunout(); }
   void onUserConfirmRequired(const char * const msg) { AnycubicTFT.OnUserConfirmRequired(msg); }
   void onStatusChanged(const char * const msg) {}
-
-  void onHomingStart() {}
-  void onHomingComplete() {}
-  void onPrintFinished() {}
-
   void onFactoryReset() {}
 
   void onStoreSettings(char *buff) {
@@ -65,7 +60,7 @@ namespace ExtUI {
     // into buff.
 
     // Example:
-    //  static_assert(sizeof(myDataStruct) <= eeprom_data_size);
+    //  static_assert(sizeof(myDataStruct) <= ExtUI::eeprom_data_size);
     //  memcpy(buff, &myDataStruct, sizeof(myDataStruct));
   }
 
@@ -75,12 +70,8 @@ namespace ExtUI {
     // from buff
 
     // Example:
-    //  static_assert(sizeof(myDataStruct) <= eeprom_data_size);
+    //  static_assert(sizeof(myDataStruct) <= ExtUI::eeprom_data_size);
     //  memcpy(&myDataStruct, buff, sizeof(myDataStruct));
-  }
-
-  void onPostprocessSettings() {
-    // Called after loading or resetting stored settings
   }
 
   void onConfigurationStoreWritten(bool success) {
@@ -93,18 +84,9 @@ namespace ExtUI {
     // whether successful or not.
   }
 
-  #if HAS_MESH
-
-    void onMeshLevelingStart() {}
-
-    void onMeshUpdate(const int8_t xpos, const int8_t ypos, const_float_t zval) {
-      // Called when any mesh points are updated
-    }
-
-    void onMeshUpdate(const int8_t xpos, const int8_t ypos, probe_state_t state) {
-      // Called when any mesh points are updated
-    }
-  #endif
+  void onMeshUpdate(const int8_t xpos, const int8_t ypos, const float zval) {
+    // Called when any mesh points are updated
+  }
 
   #if ENABLED(POWER_LOSS_RECOVERY)
     void onPowerLossResume() {
@@ -117,9 +99,6 @@ namespace ExtUI {
       // Called for temperature PID tuning result
     }
   #endif
-
-  void onSteppersDisabled() {}
-  void onSteppersEnabled()  {}
 }
 
 #endif // ANYCUBIC_LCD_I3MEGA

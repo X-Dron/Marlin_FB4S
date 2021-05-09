@@ -15,7 +15,7 @@
 
 #include "../../inc/MarlinConfig.h"
 
-#if DISABLED(MKS_WIFI)
+#ifndef MKS_WIFI
 
 #if SD_CONNECTION_IS(ONBOARD)
 
@@ -23,11 +23,10 @@
 #include "SPI.h"
 #include "fastio.h"
 
-#ifndef ONBOARD_SPI_DEVICE
-  #define ONBOARD_SPI_DEVICE SPI_DEVICE
-#endif
-
-#if HAS_SD_HOST_DRIVE
+#if HAS_SHARED_MEDIA
+  #ifndef ONBOARD_SPI_DEVICE
+    #define ONBOARD_SPI_DEVICE SPI_DEVICE
+  #endif
   #define ONBOARD_SD_SPI SPI
 #else
   SPIClass OnboardSPI(ONBOARD_SPI_DEVICE);
@@ -559,4 +558,5 @@ DRESULT disk_read (
 
 #endif // SD_CONNECTION_IS(ONBOARD)
 #endif
-#endif // __STM32F1__
+
+#endif

@@ -17,13 +17,14 @@
  *   GNU General Public License for more details.                           *
  *                                                                          *
  *   To view a copy of the GNU General Public License, go to the following  *
- *   location: <https://www.gnu.org/licenses/>.                             *
+ *   location: <https://www.gnu.org/licenses/>.                              *
  ****************************************************************************/
 
 #include "../config.h"
-#include "screens.h"
 
-#ifdef FTDI_STEPPER_CURRENT_SCREEN
+#if BOTH(TOUCH_UI_FTDI_EVE, HAS_TRINAMIC_CONFIG)
+
+#include "screens.h"
 
 using namespace FTDI;
 using namespace ExtUI;
@@ -123,4 +124,4 @@ bool StepperCurrentScreen::onTouchHeld(uint8_t tag) {
   return true;
 }
 
-#endif // FTDI_STEPPER_CURRENT_SCREEN
+#endif // TOUCH_UI_FTDI_EVE

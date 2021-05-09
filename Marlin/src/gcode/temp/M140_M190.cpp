@@ -32,7 +32,18 @@
 
 #include "../gcode.h"
 #include "../../module/temperature.h"
-#include "../../lcd/marlinui.h"
+#include "../../module/motion.h"
+#include "../../lcd/ultralcd.h"
+
+#if ENABLED(PRINTJOB_TIMER_AUTOSTART)
+  #include "../../module/printcounter.h"
+#endif
+
+#if ENABLED(PRINTER_EVENT_LEDS)
+  #include "../../feature/leds/leds.h"
+#endif
+
+#include "../../MarlinCore.h" // for wait_for_heatup, idle, startOrResumeJob
 
 /**
  * M140: Set bed temperature
@@ -44,7 +55,7 @@ void GcodeSuite::M140() {
   if (DEBUGGING(DRYRUN)) return;
 
   bool got_temp = false;
-  celsius_t temp = 0;
+  int16_t temp = 0;
 
   // Accept 'I' if temperature presets are defined
   #if PREHEAT_COUNT
@@ -70,7 +81,7 @@ void GcodeSuite::M140() {
        * temperatures need to be set below mintemp. Order of M140, M104, and M141
        * at the end of the print does not matter.
        */
-      thermalManager.auto_job_check_timer(false, true);
+      thermalManager.check_timer_autostart(false, true);
     #endif
   }
 }
@@ -94,7 +105,7 @@ void GcodeSuite::M190() {
   if (DEBUGGING(DRYRUN)) return;
 
   bool got_temp = false;
-  celsius_t temp = 0;
+  int16_t temp = 0;
 
   // Accept 'I' if temperature presets are defined
   #if PREHEAT_COUNT
@@ -110,14 +121,14 @@ void GcodeSuite::M190() {
   if (!got_temp) {
     no_wait_for_cooling = parser.seenval('S');
     got_temp = no_wait_for_cooling || parser.seenval('R');
-    if (got_temp) temp = parser.value_celsius();
+    if (got_temp) temp = int16_t(parser.value_celsius());
   }
 
   if (!got_temp) return;
 
   thermalManager.setTargetBed(temp);
 
-  TERN_(PRINTJOB_TIMER_AUTOSTART, thermalManager.auto_job_check_timer(true, false));
+  TERN_(PRINTJOB_TIMER_AUTOSTART, thermalManager.check_timer_autostart(true, false));
 
   ui.set_status_P(thermalManager.isHeatingBed() ? GET_TEXT(MSG_BED_HEATING) : GET_TEXT(MSG_BED_COOLING));
 

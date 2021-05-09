@@ -16,12 +16,12 @@
  *   GNU General Public License for more details.                           *
  *                                                                          *
  *   To view a copy of the GNU General Public License, go to the following  *
- *   location: <https://www.gnu.org/licenses/>.                             *
+ *   location: <https://www.gnu.org/licenses/>.                              *
  ****************************************************************************/
 
 #include "ftdi_extended.h"
 
-#if ENABLED(FTDI_EXTENDED)
+#ifdef FTDI_EXTENDED
 
 namespace FTDI {
   SoundPlayer sound; // Global sound player object
@@ -37,7 +37,9 @@ namespace FTDI {
   void SoundPlayer::play(effect_t effect, note_t note) {
 
     #if ENABLED(TOUCH_UI_DEBUG)
-      SERIAL_ECHO_MSG("Playing note ", note, ", instrument ", effect);
+      SERIAL_ECHO_START();
+      SERIAL_ECHOPAIR  ("Playing note ", int(note));
+      SERIAL_ECHOLNPAIR(", instrument ", int(effect));
     #endif
 
     // Play the note
@@ -62,7 +64,7 @@ namespace FTDI {
     timer.start();
   }
 
-  void SoundPlayer::play(const sound_t *seq, play_mode_t mode) {
+  void SoundPlayer::play(const sound_t* seq, play_mode_t mode) {
     sequence = seq;
     wait     = 250; // Adding this delay causes the note to not be clipped, not sure why.
     timer.start();
@@ -73,7 +75,9 @@ namespace FTDI {
 
     while (has_more_notes()) {
       onIdle();
-      TERN_(TOUCH_UI_FTDI_EVE, ExtUI::yield());
+      #ifdef EXTENSIBLE_UI
+        ExtUI::yield();
+      #endif
     }
   }
 

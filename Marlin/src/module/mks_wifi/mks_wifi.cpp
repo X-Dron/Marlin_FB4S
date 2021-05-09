@@ -1,7 +1,7 @@
 #include "mks_wifi.h"
 #ifdef MKS_WIFI
 
-#include "../../lcd/marlinui.h"
+#include "../../lcd/ultralcd.h"
 #include "mks_wifi_sd.h"
 #include "mks_test_sdio.h"
 
@@ -144,7 +144,7 @@ uint8_t mks_wifi_input(uint8_t data){
 		packet_index=0;
 		memset((uint8_t*)mks_in_buffer,0,MKS_IN_BUFF_SIZE);
 	}else if(!packet_start_flag){
-		DEBUG("Byte not in packet %0X",data);
+		DEBUG("Byte not in packet %0X %c",data,data);
 	}
 
 	if(packet_start_flag){
@@ -362,14 +362,12 @@ uint16_t mks_wifi_build_packet(uint8_t *packet, ESP_PROTOC_FRAME *esp_frame){
 
 
 void mks_wifi_send(uint8_t *packet, uint16_t size){
-
-	DEBUG("Send MKS packet %d bytes",size);
-
+	//safe_delay(10);
 	for( uint32_t i=0; i < (uint32_t)(size+1); i++){
-		while(MYSERIAL2.availableForWrite()==0){
+		while(MYSERIAL1.availableForWrite()==0){
 			safe_delay(10);				
 		}
-		MYSERIAL2.write(packet[i]);
+		MYSERIAL1.write(packet[i]);
 	}
 }
 

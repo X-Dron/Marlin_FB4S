@@ -17,13 +17,14 @@
  *   GNU General Public License for more details.                           *
  *                                                                          *
  *   To view a copy of the GNU General Public License, go to the following  *
- *   location: <https://www.gnu.org/licenses/>.                             *
+ *   location: <https://www.gnu.org/licenses/>.                              *
  ****************************************************************************/
 
 #include "../config.h"
-#include "screens.h"
 
-#ifdef FTDI_MAX_VELOCITY_SCREEN
+#if ENABLED(TOUCH_UI_FTDI_EVE)
+
+#include "screens.h"
 
 using namespace FTDI;
 using namespace ExtUI;
@@ -86,4 +87,4 @@ bool MaxVelocityScreen::onTouchHeld(uint8_t tag) {
   return true;
 }
 
-#endif // FTDI_MAX_VELOCITY_SCREEN
+#endif // TOUCH_UI_FTDI_EVE
