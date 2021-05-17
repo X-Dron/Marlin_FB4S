@@ -264,6 +264,11 @@ bool wait_for_heatup = true;
  * ******************************** FUNCTIONS ********************************
  * ***************************************************************************
  */
+#ifdef LED_SW_PIN
+  void setup_LED_SW_pin() {
+    SET_INPUT_PULLDOWN(LED_SW_PIN);
+  }
+#endif
 
 /**
  * Stepper Reset (RigidBoard, et.al.)
@@ -468,7 +473,7 @@ inline void manage_inactivity(const bool ignore_stepper_queue=false) {
     // key kill key press
     // -------------------------------------------------------------------------------
     static int killCount = 0;   // make the inactivity button a bit less responsive
-    const int KILL_DELAY = 750;
+    const int KILL_DELAY = 100000;
     if (kill_state())
       killCount++;
     else if (killCount > 0)
@@ -485,6 +490,20 @@ inline void manage_inactivity(const bool ignore_stepper_queue=false) {
 
   #if HAS_FREEZE_PIN
     Stepper::frozen = !READ(FREEZE_PIN);
+  #endif
+
+  #ifdef LED_SW_PIN
+    static int LedSw_Count = 0;   // make the inactivity button a bit less responsive
+    const int LED_SW_DELAY = 1000;
+    bool led_pin_status = READ(LED_SW_PIN);
+    if (LedSw_Count == LED_SW_DELAY && !led_pin_status){
+      caselight.on = !caselight.on;
+      caselight.update(true);
+    }
+    if (led_pin_status && LedSw_Count < LED_SW_DELAY)
+      LedSw_Count++;
+    else if (!led_pin_status)
+      LedSw_Count = 0;
   #endif
 
   #if HAS_HOME
@@ -1159,6 +1178,9 @@ void setup() {
     SETUP_RUN(recovery.setup());
   #endif
 
+  #ifdef LED_SW_PIN
+    SETUP_RUN(setup_LED_SW_pin());
+  #endif
   #if HAS_L64XX
     SETUP_RUN(L64xxManager.init());  // Set up SPI, init drivers
   #endif
